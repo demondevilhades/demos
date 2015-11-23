@@ -10,7 +10,8 @@ public class CustomClassLoaderTest {
     @Test
     public void test() throws Exception {
         CustomClassLoader customClassLoader = new CustomClassLoader(EncryptClassTest.targetPath);
-        Class<?> exampleClazz = (Class<Example>) customClassLoader.findClass("test.classencrypt.Example");
+        //Class<?> exampleClazz = (Class<Example>) customClassLoader.findClass("test.classencrypt.Example");
+        Class<?> exampleClazz = (Class<Example>) customClassLoader.findClass("test/classencrypt/Example.hclass");
         Method[] methods = exampleClazz.getMethods();
 
         Object example = exampleClazz.newInstance();

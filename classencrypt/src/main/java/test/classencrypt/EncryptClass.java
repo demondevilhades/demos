@@ -18,11 +18,15 @@ import java.util.List;
  */
 public class EncryptClass {
 
+    private static final String suffix = ".hclass";
+
     public static void encryptAll(String basePath, String target, String filter) {
         List<File> allClass = getAllClass(basePath, filter);
         for (File file : allClass) {
             String sClassPath = file.getAbsolutePath();
-            encrypt(sClassPath, sClassPath.replaceAll("\\\\", "/").replaceFirst(basePath, target));
+            encrypt(sClassPath,
+                            sClassPath.replaceAll("\\\\", "/").replaceFirst(basePath, target)
+                                            .replaceFirst("\\.class", suffix));
         }
     }
 

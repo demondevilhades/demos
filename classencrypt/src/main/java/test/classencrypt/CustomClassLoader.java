@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public class CustomClassLoader extends ClassLoader {
 
-    private final String nameFilter = ".Example";
+    private final String customSuffix = ".hclass";
 
     private String classPath = null;
 
@@ -21,43 +21,45 @@ public class CustomClassLoader extends ClassLoader {
     }
 
     @Override
-    public Class<?> findClass(String name) throws ClassNotFoundException {
-        if (name.endsWith(nameFilter)) {
-            return findClassEncrypt(name);
+    public Class<?> findClass(String fileName) throws ClassNotFoundException {
+        if (fileName.endsWith(customSuffix)) {
+            return findClassEncrypt(fileName);
         } else {
-            return super.findClass(name);
+            return super.findClass(fileName);
         }
     }
 
-    private Class<?> findClassEncrypt(String name) throws ClassNotFoundException {
+    private Class<?> findClassEncrypt(String fileName) throws ClassNotFoundException {
+        String absoluteFileName = classPath + fileName.replaceAll("\\\\", "/");
+        String className = fileName.substring(0, fileName.lastIndexOf(".")).replaceAll("\\\\", "/")
+                        .replaceAll("/", ".");
         byte[] classBytes = null;
         try {
-            classBytes = loadClassBytesEncrypt(name);
+            classBytes = loadClassBytesEncrypt(absoluteFileName);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Class<?> cl = defineClass(name, classBytes, 0, classBytes.length);
+        Class<?> cl = defineClass(className, classBytes, 0, classBytes.length);
         if (cl == null) {
-            throw new ClassNotFoundException(name);
+            throw new ClassNotFoundException(className);
         }
         return cl;
     }
 
     private byte[] loadClassBytesEncrypt(String name) throws IOException {
-        String cname = classPath + name.replace('.', '/') + ".class";
-        System.out.println(cname);
-        FileInputStream in = new FileInputStream(cname);
+        FileInputStream fis = new FileInputStream(name);
         try {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             int ch;
-            while ((ch = in.read()) != -1) {
+            while ((ch = fis.read()) != -1) {
                 buffer.write((byte) (ch - 2));
             }
-            in.close();
             return buffer.toByteArray();
         } finally {
-            in.close();
+            if (fis != null) {
+                fis.close();
+            }
         }
     }
 }

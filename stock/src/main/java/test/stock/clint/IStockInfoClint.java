@@ -1,5 +1,7 @@
 package test.stock.clint;
 
+import test.stock.bean.SingleStockInfo;
+
 /**
  * 信息链接
  * 
@@ -12,5 +14,5 @@ public interface IStockInfoClint {
      * 
      * @return
      */
-    public String getSingleInfo(String stockCode);
+    public SingleStockInfo getSingleInfo(String stockCode);
 }

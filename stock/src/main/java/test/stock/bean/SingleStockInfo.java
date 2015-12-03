@@ -3,7 +3,7 @@ package test.stock.bean;
 import java.io.Serializable;
 
 /**
- * 实体
+ * 股票信息实体
  * 
  * @author HaDeS
  */

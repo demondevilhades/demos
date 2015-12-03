@@ -1,6 +1,12 @@
 package test.stock.clint.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +30,8 @@ import test.stock.clint.IStockInfoClint;
 public class SinaStockInfoClint implements IStockInfoClint {
 
     private static final String URL = "http://hq.sinajs.cn/list=";
+
+    private static final String URL_HIS = "http://market.finance.sina.com.cn/downxls.php?date=";
 
     public SinaStockInfoClint() {
     }
@@ -96,6 +104,65 @@ public class SinaStockInfoClint implements IStockInfoClint {
             }
         }
         return compositeIndexList;
+    }
+
+    @Override
+    public void getInfoByDay(String date, String code) {
+        // TODO Auto-generated method stub
+        String reqUrl = URL_HIS + date + "&symbol=sh" + code;
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        CloseableHttpClient closeableHttpClient = httpClientBuilder.build();
+        HttpGet httpGet = new HttpGet(reqUrl);
+        InputStream is = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+        List<String[]> infoList = null;
+        byte[] bytes = null;
+        try {
+            HttpResponse httpResponse = closeableHttpClient.execute(httpGet);
+            httpResponse.setHeader("charset", "GB2312");
+            StatusLine statusLine = httpResponse.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+            if (statusCode == 200) {
+                infoList = new ArrayList<String[]>(1568);
+                HttpEntity entity = httpResponse.getEntity();
+                is = entity.getContent();
+                isr = new InputStreamReader(is);
+                br = new BufferedReader(isr);
+
+                String[] params;
+                bytes = br.readLine().getBytes();
+                String infoLine = new String(bytes, Charset.forName("GB2312"));
+                while (infoLine != null) {
+                    params = infoLine.split("\t");
+                    infoList.add(params);
+                    infoLine = br.readLine();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (br != null) {
+                    br.close();
+                }
+                if (isr != null) {
+                    isr.close();
+                }
+                if (is != null) {
+                    is.close();
+                }
+                closeableHttpClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        if(infoList != null){
+            String[] strings = infoList.get(0);
+            System.out.println(strings[0]);
+            System.out.println(strings[1]);
+        }
     }
 
     /**

@@ -51,4 +51,14 @@ public interface IStockInfoClint {
      * @return
      */
     public List<SingleCompositeIndex> getMultiCompositeIndex(List<String> indexCodeList, boolean type);
+
+    /**
+     * 获取历史成交明细
+     * 
+     * @param date
+     *            日期
+     * @param code
+     *            代码
+     */
+    public void getInfoByDay(String date, String code);
 }

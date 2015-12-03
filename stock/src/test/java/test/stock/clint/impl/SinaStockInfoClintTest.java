@@ -56,4 +56,9 @@ public class SinaStockInfoClintTest {
             System.out.println(singleCompositeIndex);
         }
     }
+
+    @Test
+    public void getInfoByDayTest(){
+        stockInfoClint.getInfoByDay("2011-07-08", "600900");
+    }
 }

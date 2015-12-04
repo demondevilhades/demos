@@ -1,6 +1,5 @@
 package test.stock.clint.impl;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,7 +106,7 @@ public class SinaStockInfoClint implements IStockInfoClint {
     }
 
     @Override
-    public void getInfoByDay(String date, String code) {
+    public List<String[]> getInfoByDay(String date, String code) {
         // TODO Auto-generated method stub
         String reqUrl = URL_HIS + date + "&symbol=sh" + code;
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
@@ -117,22 +116,19 @@ public class SinaStockInfoClint implements IStockInfoClint {
         InputStreamReader isr = null;
         BufferedReader br = null;
         List<String[]> infoList = null;
-        byte[] bytes = null;
         try {
             HttpResponse httpResponse = closeableHttpClient.execute(httpGet);
-            httpResponse.setHeader("charset", "GB2312");
             StatusLine statusLine = httpResponse.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
                 infoList = new ArrayList<String[]>(1568);
                 HttpEntity entity = httpResponse.getEntity();
                 is = entity.getContent();
-                isr = new InputStreamReader(is);
+                isr = new InputStreamReader(is, Charset.forName("GBK"));
                 br = new BufferedReader(isr);
 
                 String[] params;
-                bytes = br.readLine().getBytes();
-                String infoLine = new String(bytes, Charset.forName("GB2312"));
+                String infoLine = br.readLine();
                 while (infoLine != null) {
                     params = infoLine.split("\t");
                     infoList.add(params);
@@ -157,12 +153,7 @@ public class SinaStockInfoClint implements IStockInfoClint {
                 e.printStackTrace();
             }
         }
-        
-        if(infoList != null){
-            String[] strings = infoList.get(0);
-            System.out.println(strings[0]);
-            System.out.println(strings[1]);
-        }
+        return infoList;
     }
 
     /**

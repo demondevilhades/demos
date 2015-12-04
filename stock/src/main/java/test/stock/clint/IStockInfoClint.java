@@ -59,6 +59,7 @@ public interface IStockInfoClint {
      *            日期
      * @param code
      *            代码
+     * @return
      */
-    public void getInfoByDay(String date, String code);
+    public List<String[]> getInfoByDay(String date, String code);
 }

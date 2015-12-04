@@ -1,5 +1,6 @@
 package test.stock.clint.impl;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,7 +59,11 @@ public class SinaStockInfoClintTest {
     }
 
     @Test
-    public void getInfoByDayTest(){
-        stockInfoClint.getInfoByDay("2011-07-08", "600900");
+    public void getInfoByDayTest() {
+        List<String[]> infoByDay = stockInfoClint.getInfoByDay("2011-07-08", "600900");
+        Assert.assertNotNull(infoByDay);
+        for (String[] strs : infoByDay) {
+            System.out.println(Arrays.toString(strs));
+        }
     }
 }

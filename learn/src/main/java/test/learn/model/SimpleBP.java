@@ -8,6 +8,11 @@ import java.util.Set;
 import test.learn.exception.InitException;
 import test.learn.util.Function;
 
+/**
+ * simple bpnn
+ * 
+ * @author hades
+ */
 public class SimpleBP {
 
     private Brain brain = null;
@@ -142,54 +147,60 @@ public class SimpleBP {
             double[] hide = new double[hideSize];
             double[] output = new double[outputSize];
 
-            double sum;
-            for (int i = 0; i < hideSize; i++) {
-                sum = 0;
-                for (int j = 0; j < inputSize; j++) {
-                    sum += inputData[j] * w_ih[j][i];
+            calcResult(inputData, hide, w_ih, b_ih);
+            calcResult(hide, output, w_ho, b_ho);
+
+            double[] reviseOutput = new double[outputSize];
+            for (int i = 0; i < outputSize; i++) {
+                reviseOutput[i] = output[i] * (1 - output[i]) * (resultData[i] - output[i]);
+                err += Math.pow((resultData[i] - output[i]), 2);
+                for (int j = 0; j < hideSize; j++) {
+                    w_ho[j][i] += e_ho * reviseOutput[i] * hide[j];
                 }
-                sum += b_ih[i];
-                hide[i] = Function.sigmoid(sum);
+                b_ho[i] = e_ho * reviseOutput[i];
             }
 
-            for (int i = 0; i < outputSize; i++) {
+            revise_ih(reviseOutput, inputData, hide, hideSize, outputSize, inputSize, w_ho, w_ih, b_ih, e_ih);
+
+            return err;
+        }
+
+        /**
+         * calculate layer
+         * 
+         * @param input
+         * @param output
+         * @param w
+         * @param b
+         */
+        private void calcResult(double[] input, double[] output, double[][] w, double[] b) {
+            double sum;
+            for (int i = 0; i < output.length; i++) {
                 sum = 0;
-                for (int j = 0; j < hideSize; j++) {
-                    sum += hide[j] * w_ho[j][i];
+                for (int j = 0; j < input.length; j++) {
+                    sum += input[j] * w[j][i];
                 }
-                sum += b_ho[i];
+                sum += b[i];
                 output[i] = Function.sigmoid(sum);
             }
+        }
 
-            double[] reviceOutput = new double[outputSize];
-            for (int i = 0; i < outputSize; i++) {
-                reviceOutput[i] = output[i] * (1 - output[i]) * (resultData[i] - output[i]);
-                err += Math.pow((resultData[i] - output[i]), 2);
-            }
-
+        private double[] revise_ih(double[] reviseOutput, double[] input, double[] hide, int hideSize, int outputSize,
+                        int inputSize, double[][] w_ho, double[][] w, double[] b, double e) {
+            double sum;
             double[] reviceHide = new double[hideSize];
             for (int i = 0; i < hideSize; i++) {
                 sum = 0;
                 for (int j = 0; j < outputSize; j++) {
-                    sum += reviceOutput[j] * w_ho[i][j];
+                    sum += reviseOutput[j] * w_ho[i][j];
                 }
                 reviceHide[i] = hide[i] * (1 - hide[i]) * sum;
-            }
-
-            for (int i = 0; i < outputSize; i++) {
-                for (int j = 0; j < hideSize; j++) {
-                    w_ho[j][i] += e_ho * reviceOutput[i] * hide[j];
-                }
-                b_ho[i] = e_ho * reviceOutput[i];
-            }
-
-            for (int i = 0; i < hideSize; i++) {
                 for (int j = 0; j < inputSize; j++) {
-                    w_ih[j][i] += e_ih * reviceHide[i] * inputData[j];
+                    w[j][i] += e * reviceHide[i] * input[j];
                 }
-                b_ih[i] = e_ih * reviceHide[i];
+                b[i] = e * reviceHide[i];
             }
-            return err;
+            return reviceHide;
         }
 
         public double[] expect(double[] input) {

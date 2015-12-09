@@ -51,9 +51,9 @@ public class SimpleBPTest {
     @Test
     public void test() {
         simpleBP = new SimpleBP();
-        simpleBP.initBrain(32, 15, 4, 0.5);
+        simpleBP.initBrain(32, 15, 4, 0.3);
         simpleBP.initData(dataMap);
-        double train = simpleBP.train(1000);
+        double train = simpleBP.train(3000);
         System.out.println(train);
         System.out.println(Arrays.toString(simpleBP.getResult(int2binary(3451))));
         System.out.println(Arrays.toString(simpleBP.getResult(int2binary(500))));

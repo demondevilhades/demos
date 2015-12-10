@@ -17,7 +17,7 @@ public class MultiBPTest {
     @Before
     public void before() {
         int value;
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 500; i++) {
             value = random.nextInt();
             double[] resultData = { 0, 0, 0, 0 };
             if (value > 0) {
@@ -51,7 +51,7 @@ public class MultiBPTest {
     @Test
     public void test() {
         multiBP = new MultiBP();
-        multiBP.initBrain(new int[] { 32, 15, 4 }, new double[] { 0.2, 0.2 });
+        multiBP.initBrain(new int[] { 32, 15, 15, 4 }, new double[] { 0.2, 0.2, 0.2 });
         multiBP.initData(dataMap);
         double train = multiBP.train(500);
         System.out.println(train);

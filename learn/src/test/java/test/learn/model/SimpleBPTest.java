@@ -17,7 +17,7 @@ public class SimpleBPTest {
     @Before
     public void before() {
         int value;
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 500; i++) {
             value = random.nextInt();
             double[] resultData = { 0, 0, 0, 0 };
             if (value > 0) {

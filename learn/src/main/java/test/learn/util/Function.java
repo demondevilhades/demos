@@ -1,5 +1,10 @@
 package test.learn.util;
 
+/**
+ * function
+ * 
+ * @author hades
+ */
 public class Function {
 
     /**

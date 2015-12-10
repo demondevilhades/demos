@@ -8,9 +8,9 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SimpleBPTest {
+public class MultiBPTest {
 
-    private SimpleBP simpleBP;
+    private MultiBP multiBP;
     private Map<double[], double[]> dataMap = new HashMap<double[], double[]>();
     private Random random = new Random(18980000);
 
@@ -50,14 +50,14 @@ public class SimpleBPTest {
 
     @Test
     public void test() {
-        simpleBP = new SimpleBP();
-        simpleBP.initBrain(32, 15, 4, 0.2);
-        simpleBP.initData(dataMap);
-        double train = simpleBP.train(500);
+        multiBP = new MultiBP();
+        multiBP.initBrain(new int[] { 32, 15, 4 }, new double[] { 0.2, 0.2 });
+        multiBP.initData(dataMap);
+        double train = multiBP.train(500);
         System.out.println(train);
-        System.out.println(Arrays.toString(simpleBP.getResult(int2binary(3451))));
-        System.out.println(Arrays.toString(simpleBP.getResult(int2binary(500))));
-        System.out.println(Arrays.toString(simpleBP.getResult(int2binary(-32767))));
-        System.out.println(Arrays.toString(simpleBP.getResult(int2binary(-9876))));
+        System.out.println(Arrays.toString(multiBP.getResult(int2binary(3451))));
+        System.out.println(Arrays.toString(multiBP.getResult(int2binary(500))));
+        System.out.println(Arrays.toString(multiBP.getResult(int2binary(-32767))));
+        System.out.println(Arrays.toString(multiBP.getResult(int2binary(-9876))));
     }
 }

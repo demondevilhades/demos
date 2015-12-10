@@ -9,20 +9,20 @@ import test.learn.exception.InitException;
 import test.learn.util.Function;
 
 /**
- * simple bpnn
+ * multiple bpnn
  * 
  * @author hades
  */
-public class SimpleBP {
+public class MultiBP {
 
     private Brain brain = null;
     private Map<double[], double[]> dataMap = null;
 
-    public SimpleBP() {
+    public MultiBP() {
     }
 
-    public void initBrain(int inputSize, int hideSize, int outputSize, double e) {
-        this.brain = new Brain(inputSize, hideSize, outputSize, e);
+    public void initBrain(int[] size, double[] e) {
+        this.brain = new Brain(size, e);
     }
 
     public void initData(Map<double[], double[]> dataMap) {
@@ -38,7 +38,7 @@ public class SimpleBP {
         }
         Set<Entry<double[], double[]>> entrySet = dataMap.entrySet();
         for (Map.Entry<double[], double[]> entry : entrySet) {
-            if (entry.getKey().length != brain.inputSize || entry.getValue().length != brain.outputSize) {
+            if (entry.getKey().length != brain.size[0] || entry.getValue().length != brain.size[brain.size.length - 1]) {
                 throw new InitException("[ERROR]dataMap not match the current brain!");
             }
         }
@@ -59,59 +59,46 @@ public class SimpleBP {
 
     private class Brain {
 
-        private int inputSize;
-        private int hideSize;
-        private int outputSize;
+        private int[] size;
 
         /**
-         * weight matrix from input to hide
+         * weight matrix
          */
-        private double[][] w_ih;
-        /**
-         * weight matrix from hide to output
-         */
-        private double[][] w_ho;
-        /**
-         * threshold from input to hide
-         */
-        private double[] b_ih;
-        /**
-         * threshold from hide to output
-         */
-        private double[] b_ho;
+        private double[][][] w;
 
         /**
-         * learning rate from input to hide
+         * threshold
          */
-        private double e_ih;
+        private double[][] b;
+
         /**
-         * learning rate from hide to output
+         * learning rate
          */
-        private double e_ho;
+        private double[] e;
 
         private Random random;
 
-        private Brain(int inputSize, int hideSize, int outputSize, double e) {
-            init(inputSize, hideSize, outputSize, e);
+        private Brain(int[] size, double[] e) {
+            init(size, e);
         }
 
-        private void init(int inputSize, int hideSize, int outputSize, double e) {
-            this.inputSize = inputSize;
-            this.hideSize = hideSize;
-            this.outputSize = outputSize;
-            this.e_ih = e;
-            this.e_ho = e;
-
-            w_ih = new double[inputSize][hideSize];
-            w_ho = new double[hideSize][outputSize];
-            b_ih = new double[hideSize];
-            b_ho = new double[outputSize];
-
+        private void init(int[] size, double[] e) {
+            this.size = size;
+            this.e = e;
             random = new Random();
-            initW(w_ih);
-            initW(w_ho);
-            initB(b_ih);
-            initB(b_ho);
+
+            int layerNum = size.length - 1;
+
+            w = new double[layerNum][][];
+            for (int i = 0; i < layerNum; i++) {
+                w[i] = new double[size[i]][size[i + 1]];
+                initW(w[i]);
+            }
+            b = new double[layerNum][];
+            for (int i = 0; i < layerNum; i++) {
+                b[i] = new double[size[i + 1]];
+                initB(b[i]);
+            }
         }
 
         private void initW(double[][] w) {
@@ -144,23 +131,34 @@ public class SimpleBP {
         public double train(double[] inputData, double[] resultData) {
             double err = 0.0d;
 
-            double[] hide = new double[hideSize];
-            double[] output = new double[outputSize];
+            double[][] layer = new double[size.length][];
+            layer[0] = inputData;
 
-            calcResult(inputData, hide, w_ih, b_ih);
-            calcResult(hide, output, w_ho, b_ho);
-
-            double[] reviseOutput = new double[outputSize];
-            for (int i = 0; i < outputSize; i++) {
-                reviseOutput[i] = output[i] * (1 - output[i]) * (resultData[i] - output[i]);
-                err += Math.pow((resultData[i] - output[i]), 2);
-                for (int j = 0; j < hideSize; j++) {
-                    w_ho[j][i] += e_ho * reviseOutput[i] * hide[j];
-                }
-                b_ho[i] = e_ho * reviseOutput[i];
+            for (int i = 1; i < size.length; i++) {
+                layer[i] = new double[size[i]];
+                calcResult(layer[i - 1], layer[i], w[i - 1], b[i - 1]);
             }
 
-            revise_ih(reviseOutput, inputData, hide, hideSize, outputSize, inputSize, w_ho, w_ih, b_ih, e_ih);
+            int lastLayerIndex = layer.length - 1;
+            double[][] revise = new double[lastLayerIndex][];
+            double[] outputLayer = layer[lastLayerIndex];
+            double[] outputHideLayer = layer[lastLayerIndex - 1];
+            revise[lastLayerIndex - 1] = new double[outputLayer.length];
+            for (int i = 0; i < outputLayer.length; i++) {
+                revise[lastLayerIndex - 1][i] = outputLayer[i] * (1 - outputLayer[i])
+                                * (resultData[i] - outputLayer[i]);
+                err += Math.pow((resultData[i] - outputLayer[i]), 2);
+                for (int j = 0; j < outputHideLayer.length; j++) {
+                    w[lastLayerIndex - 1][j][i] += e[lastLayerIndex - 1] * revise[lastLayerIndex - 1][i]
+                                    * outputHideLayer[j];
+                }
+                b[lastLayerIndex - 1][i] = e[lastLayerIndex - 1] * revise[lastLayerIndex - 1][i];
+            }
+
+            for (int i = lastLayerIndex - 2; i >= 0; i--) {
+                revise[i] = revise_ih(revise[i + 1], layer[i], layer[i + 1], layer[i + 1].length, layer[i + 2].length,
+                                layer[i].length, w[i + 1], w[i], b[i], e[i]);
+            }
 
             return err;
         }
@@ -219,14 +217,13 @@ public class SimpleBP {
         }
 
         public double[] expect(double[] input) {
-            double[] exceptData = new double[outputSize];
-
-            double[] hide = new double[hideSize];
-
-            expect(input, hide, w_ih, b_ih);
-            expect(hide, exceptData, w_ho, b_ho);
-
-            return exceptData;
+            double[][] layer = new double[size.length][];
+            layer[0] = input;
+            for (int i = 0; i < layer.length - 1; i++) {
+                layer[i + 1] = new double[size[i + 1]];
+                expect(layer[i], layer[i + 1], w[i], b[i]);
+            }
+            return layer[layer.length - 1];
         }
 
         private void expect(double[] input, double[] output, double[][] w, double[] b) {

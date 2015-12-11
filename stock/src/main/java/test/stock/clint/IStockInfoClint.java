@@ -12,8 +12,6 @@ import test.stock.bean.SingleStockInfo;
  */
 public interface IStockInfoClint {
 
-    public void init();
-
     /**
      * 获取单个股票信息
      * 

@@ -23,7 +23,6 @@ public class SinaStockInfoClintTest {
 
     @Before
     public void setUp() {
-        stockInfoClint.init();
     }
 
     @Test

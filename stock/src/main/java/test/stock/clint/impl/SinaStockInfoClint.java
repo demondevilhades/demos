@@ -34,12 +34,12 @@ public class SinaStockInfoClint implements IStockInfoClint {
     private CloseableHttpClient closeableHttpClient;
 
     public SinaStockInfoClint() {
+        closeableHttpClient = HttpClientBuilder.create().build();
     }
 
     @Override
-    public void init() {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        closeableHttpClient = httpClientBuilder.build();
+    protected void finalize() throws Throwable {
+        closeableHttpClient.close();
     }
 
     @Override

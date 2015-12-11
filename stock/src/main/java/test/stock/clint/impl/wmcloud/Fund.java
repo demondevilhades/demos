@@ -19,12 +19,24 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+/**
+ * 基金
+ * 
+ * @author hades
+ */
 public class Fund {
     private CloseableHttpClient httpClient = null;
 
     private static final String URL = "https://api.wmcloud.com:443/data/v1/";
     private static final String GET_FUND = "api/fund/getFund.json?field=${field}&secID=${secID}&etfLof=${etfLof}&listStatusCd=${listStatusCd}&ticker=${ticker}";
     private static final String GET_FUND_NAV = "/api/fund/getFundNav.json?field=&beginDate=20140101&endDate=20141231&secID=&ticker=000001&dataDate=";
+
+    private static final String RET_CODE = "retCode";
+    private static final String DATA = "data";
 
     public Fund() {
         httpClient = createHttpsClient();
@@ -35,8 +47,18 @@ public class Fund {
         httpClient.close();
     }
 
-    public String getFundJson(String ticker) {
-        return getFundJson(ticker, null, null, null, null);
+    public String getFundJsonStr(String ticker) {
+        return getFundJsonStr(ticker, null, null, null, null);
+    }
+
+    public JSONArray getFundJson(String ticker, String listStatusCd, String etfLof, String secID, String field) {
+        JSONArray jsonArray = new JSONArray();
+        String jsonStr = getFundJsonStr(ticker, listStatusCd, etfLof, secID, field);
+        JSONObject jsonObject = JSON.parseObject(jsonStr);
+        if (jsonObject.getIntValue(RET_CODE) == 1) {
+            jsonArray = jsonObject.getJSONArray(DATA);
+        }
+        return jsonArray;
     }
 
     /**
@@ -49,7 +71,7 @@ public class Fund {
      * @param field
      * @return
      */
-    public String getFundJson(String ticker, String listStatusCd, String etfLof, String secID, String field) {
+    public String getFundJsonStr(String ticker, String listStatusCd, String etfLof, String secID, String field) {
         String result = "";
         String url = getFundUrl(ticker, listStatusCd, etfLof, secID, field);
 

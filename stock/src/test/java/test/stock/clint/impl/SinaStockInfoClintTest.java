@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import test.stock.bean.SingleCompositeIndex;
@@ -19,6 +20,11 @@ import test.stock.clint.IStockInfoClint;
 public class SinaStockInfoClintTest {
 
     private IStockInfoClint stockInfoClint = new SinaStockInfoClint();
+
+    @Before
+    public void setUp() {
+        stockInfoClint.init();
+    }
 
     @Test
     public void getSingleStockInfoTest() {

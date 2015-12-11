@@ -10,8 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -29,10 +29,17 @@ import test.stock.clint.IStockInfoClint;
 public class SinaStockInfoClint implements IStockInfoClint {
 
     private static final String URL = "http://hq.sinajs.cn/list=";
-
     private static final String URL_HIS = "http://market.finance.sina.com.cn/downxls.php?date=";
 
+    private CloseableHttpClient closeableHttpClient;
+
     public SinaStockInfoClint() {
+    }
+
+    @Override
+    public void init() {
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        closeableHttpClient = httpClientBuilder.build();
     }
 
     @Override
@@ -107,17 +114,15 @@ public class SinaStockInfoClint implements IStockInfoClint {
 
     @Override
     public List<String[]> getInfoByDay(String date, String code) {
-        // TODO Auto-generated method stub
         String reqUrl = URL_HIS + date + "&symbol=sh" + code;
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        CloseableHttpClient closeableHttpClient = httpClientBuilder.build();
         HttpGet httpGet = new HttpGet(reqUrl);
         InputStream is = null;
         InputStreamReader isr = null;
         BufferedReader br = null;
         List<String[]> infoList = null;
+        CloseableHttpResponse httpResponse = null;
         try {
-            HttpResponse httpResponse = closeableHttpClient.execute(httpGet);
+            httpResponse = closeableHttpClient.execute(httpGet);
             StatusLine statusLine = httpResponse.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
@@ -148,7 +153,9 @@ public class SinaStockInfoClint implements IStockInfoClint {
                 if (is != null) {
                     is.close();
                 }
-                closeableHttpClient.close();
+                if (httpResponse != null) {
+                    httpResponse.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -163,11 +170,10 @@ public class SinaStockInfoClint implements IStockInfoClint {
      * @return
      */
     private String httpGet(String reqUrl) {
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
-        CloseableHttpClient closeableHttpClient = httpClientBuilder.build();
         HttpGet httpGet = new HttpGet(reqUrl);
+        CloseableHttpResponse httpResponse = null;
         try {
-            HttpResponse httpResponse = closeableHttpClient.execute(httpGet);
+            httpResponse = closeableHttpClient.execute(httpGet);
             StatusLine statusLine = httpResponse.getStatusLine();
             int statusCode = statusLine.getStatusCode();
             if (statusCode == 200) {
@@ -180,7 +186,9 @@ public class SinaStockInfoClint implements IStockInfoClint {
             e.printStackTrace();
         } finally {
             try {
-                closeableHttpClient.close();
+                if (httpResponse != null) {
+                    httpResponse.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

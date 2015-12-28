@@ -12,15 +12,17 @@ public class MysqlConnextion {
 
     public static void init() {
         HikariConfig config = new HikariConfig();
-        config.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-        config.addDataSourceProperty("serverName", "localhost");
-        config.addDataSourceProperty("port", "3306");
-        config.addDataSourceProperty("databaseName", "test");
+        config.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/financial?characterEncoding=utf-8");
+        config.setDriverClassName("com.mysql.jdbc.Driver");
+//        config.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+//        config.addDataSourceProperty("serverName", "localhost");
+//        config.addDataSourceProperty("port", "3306");
+//        config.addDataSourceProperty("databaseName", "financial");
         config.addDataSourceProperty("user", "root");
         config.addDataSourceProperty("password", "root");
 
-        config.addDataSourceProperty("useUnicode", "true");
-        config.addDataSourceProperty("characterEncoding", "utf8");
+//        config.addDataSourceProperty("useUnicode", "true");
+//        config.addDataSourceProperty("characterEncoding", "utf8");
         ds = new HikariDataSource(config);
     }
 

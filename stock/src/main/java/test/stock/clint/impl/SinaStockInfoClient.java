@@ -19,21 +19,21 @@ import org.apache.http.util.EntityUtils;
 
 import test.stock.bean.SingleCompositeIndex;
 import test.stock.bean.SingleStockInfo;
-import test.stock.clint.IStockInfoClint;
+import test.stock.clint.IStockInfoClient;
 
 /**
  * 新浪信息链接
  * 
  * @author zs
  */
-public class SinaStockInfoClint implements IStockInfoClint {
+public class SinaStockInfoClient implements IStockInfoClient {
 
     private static final String URL = "http://hq.sinajs.cn/list=";
     private static final String URL_HIS = "http://market.finance.sina.com.cn/downxls.php?date=";
 
     private CloseableHttpClient closeableHttpClient;
 
-    public SinaStockInfoClint() {
+    public SinaStockInfoClient() {
         closeableHttpClient = HttpClientBuilder.create().build();
     }
 

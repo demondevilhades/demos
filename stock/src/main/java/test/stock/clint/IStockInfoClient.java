@@ -10,7 +10,7 @@ import test.stock.bean.SingleStockInfo;
  * 
  * @author zs
  */
-public interface IStockInfoClint {
+public interface IStockInfoClient {
 
     /**
      * 获取单个股票信息

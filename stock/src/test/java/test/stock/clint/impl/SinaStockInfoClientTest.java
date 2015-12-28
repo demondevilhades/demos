@@ -10,16 +10,16 @@ import org.junit.Test;
 
 import test.stock.bean.SingleCompositeIndex;
 import test.stock.bean.SingleStockInfo;
-import test.stock.clint.IStockInfoClint;
+import test.stock.clint.IStockInfoClient;
 
 /**
  * 新浪链接测试类
  * 
  * @author zs
  */
-public class SinaStockInfoClintTest {
+public class SinaStockInfoClientTest {
 
-    private IStockInfoClint stockInfoClint = new SinaStockInfoClint();
+    private IStockInfoClient stockInfoClint = new SinaStockInfoClient();
 
     @Before
     public void setUp() {

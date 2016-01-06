@@ -43,7 +43,7 @@ public class FundTest {
         // 结果显示 EFT 与 LOF 均无分级基金
     }
 
-    @Test
+//    @Test
     public void getFundJsonTestByListStatusCd() {
         JSONArray jsonArray;
         int size;
@@ -57,5 +57,11 @@ public class FundTest {
                 System.out.println(jsonObject.getString("ticker"));
             }
         }
+    }
+    
+    @Test
+    public void getFundInfoStrTest(){
+        String result = fund.getFundInfoStr("150278");
+        System.out.println(result);
     }
 }

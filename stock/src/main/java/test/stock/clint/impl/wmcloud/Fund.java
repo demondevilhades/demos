@@ -96,6 +96,32 @@ public class Fund {
         return result;
     }
 
+    public String getFundInfoStr(String ticker) {
+        String result = "";
+        StringBuilder sb = new StringBuilder(URL);
+        sb.append("api/market/getMktFundd.json?field=&ticker=").append(ticker);
+        String url = sb.toString();
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.addHeader("Authorization", "Bearer " + Conf.ACCESS_TOKEN);
+        CloseableHttpResponse response = null;
+        try {
+            response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity);
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
     private String getFundUrl(String ticker, String listStatusCd, String etfLof, String secID, String field) {
         StringBuilder sb = new StringBuilder(URL);
         sb.append("api/fund/getFund.json?field=");

@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 public abstract class Dao {
 
-    private Connection conn = null;
+    protected Connection conn = null;
 
     public Dao() throws SQLException {
         initConn();
@@ -23,13 +23,5 @@ public abstract class Dao {
             conn.close();
         }
         conn = null;
-    }
-
-    protected void setConn(Connection conn) {
-        this.conn = conn;
-    }
-
-    protected Connection getConn() {
-        return conn;
     }
 }

@@ -26,7 +26,7 @@ public abstract class ReadDaoAdapter<T> extends Dao {
 
     @Override
     public final void initConn() throws SQLException {
-        setConn(DBUtil.getDbUtil().getReadConn());
+        conn = DBUtil.getDbUtil().getReadConn();
     }
 
     protected abstract String getRetriveSql();
@@ -38,7 +38,7 @@ public abstract class ReadDaoAdapter<T> extends Dao {
         ResultSet rs = null;
         List<T> datas = new LinkedList<T>();
         try {
-            pstmt = getConn().prepareStatement(getRetriveSql());
+            pstmt = conn.prepareStatement(getRetriveSql());
             pstmt.setInt(1, firstIndex);
             pstmt.setInt(2, size);
             rs = pstmt.executeQuery();

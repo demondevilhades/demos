@@ -24,7 +24,7 @@ public abstract class WriteDaoAdapter<T> extends Dao {
 
     @Override
     public final void initConn() throws SQLException {
-        setConn(DBUtil.getDbUtil().getWriteConn());
+        conn = DBUtil.getDbUtil().getWriteConn();
     }
 
     protected abstract String getBatchInsertSql();
@@ -34,8 +34,8 @@ public abstract class WriteDaoAdapter<T> extends Dao {
     public void batchInsert(List<T> datas) throws SQLException {
         PreparedStatement pstmt = null;
         try {
-            getConn().setAutoCommit(false);
-            pstmt = getConn().prepareStatement(getBatchInsertSql());
+            conn.setAutoCommit(false);
+            pstmt = conn.prepareStatement(getBatchInsertSql());
 
             for (T data : datas) {
                 setData(pstmt, data);
@@ -48,9 +48,9 @@ public abstract class WriteDaoAdapter<T> extends Dao {
                 resultNum += i;
             }
             if (datas.size() == resultNum) {
-                getConn().commit();
+                conn.commit();
             } else {
-                getConn().rollback();
+                conn.rollback();
                 throw new SQLException("[datas] batch insert num : " + datas.size() + "\tcommit num : " + resultNum);
             }
         } catch (SQLException e) {
@@ -66,8 +66,8 @@ public abstract class WriteDaoAdapter<T> extends Dao {
     public void batchInsertAutoCommit(List<T> datas) throws SQLException {
         PreparedStatement pstmt = null;
         try {
-            getConn().setAutoCommit(true);
-            pstmt = getConn().prepareStatement(getBatchInsertSql());
+            conn.setAutoCommit(true);
+            pstmt = conn.prepareStatement(getBatchInsertSql());
 
             for (T data : datas) {
                 setData(pstmt, data);

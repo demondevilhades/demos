@@ -1,4 +1,4 @@
-package com.agrantsem.tools.csript;
+package test.tools.csript;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

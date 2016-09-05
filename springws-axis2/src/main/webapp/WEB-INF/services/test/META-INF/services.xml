@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<service name="testWS1">
+	<description>web service</description>
+	<parameter name="ServiceObjectSupplier">
+		org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+	</parameter>
+	<parameter name="SpringBeanName">testWS</parameter>
+	<operation name="aaa">
+		<messageReceiver class="org.apache.axis2.rpc.receivers.RPCMessageReceiver" />
+	</operation>
+</service>

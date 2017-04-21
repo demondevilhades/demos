@@ -1,12 +1,24 @@
 package com.hades.leetcode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class P31 {
+
+    private final Comparator comparator = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+            return o1 - o2;
+        }
+    };
+
+    @SuppressWarnings("unchecked")
     public int[] nextPermutation(int[] nums) {
-        if(nums.length > 0){
+        if (nums.length > 0) {
             boolean b = true;
             for (int i = nums.length - 1; i > 0; i--) {
                 if (nums[i - 1] < nums[i]) {
@@ -22,20 +34,30 @@ public class P31 {
                     nums[nums.length - 1 - i] = replace;
                 }
             } else {
-                List<Integer> list = new LinkedList<Integer>();
+                List<Integer> list = new ArrayList<Integer>();
                 for (int i = nums.length - 1; i > 0; i--) {
                     list.add(nums[i]);
                     if (nums[i - 1] < nums[i]) {
-                        replace = nums[i];
+                        list.add(nums[i - 1]);
+                        Collections.sort(list, comparator);
+                        replace = nums[i - 1];
                         for (int l : list) {
-                            if(replace > l && l > nums[i - 1]){
+                            if (replace < l) {
                                 replace = l;
+                                break;
                             }
                         }
-                        
-                        replace = nums[i];
-                        nums[i] = nums[i - 1];
                         nums[i - 1] = replace;
+                        int size = list.size();
+                        boolean jump = true;
+                        for (int j = 0, h = i; j < size; j++) {
+                            int a = list.get(j);
+                            if (jump && a == replace) {
+                                jump = false;
+                                continue;
+                            }
+                            nums[h++] = a;
+                        }
                         break;
                     }
                 }

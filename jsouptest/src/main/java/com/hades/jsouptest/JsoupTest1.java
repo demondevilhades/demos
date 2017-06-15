@@ -53,9 +53,9 @@ public class JsoupTest1 {
     }
 
     public static void main(String[] args) throws Exception {
-        System.getProperties().setProperty("http.proxyHost", "proxy.zte.com.cn");
+        System.getProperties().setProperty("http.proxyHost", "proxy.***.com.cn");
         System.getProperties().setProperty("http.proxyPort", "80");
-        System.getProperties().setProperty("https.proxyHost", "proxy.zte.com.cn");
+        System.getProperties().setProperty("https.proxyHost", "proxy.***.com.cn");
         System.getProperties().setProperty("https.proxyPort", "80");
         System.getProperties().setProperty("proxySet", "true");
         new JsoupTest1().run();

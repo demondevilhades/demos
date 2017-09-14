@@ -18,23 +18,30 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class ZKLockImpl implements ZKLock {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZKLockImpl.class);
+    private static final String SERVER = "10.18.224.106:2181,10.18.224.106:2182,10.18.224.106:2183";
+    private static final String ROOT = "/root/lock";
+    private static final Pattern SEQ_PATTERN = Pattern.compile("^\\d{10}$");
 
     private final ZkClient client;
-    private final String server = "10.18.224.106:2181,10.18.224.106:2182,10.18.224.106:2183";
-    private final String root = "/root/lock";
     private final String nodePath;
     private final String lockName;
     private final int subIndex;
-    private final Pattern seqPattern = Pattern.compile("^\\d{10}$");
 
     private String seqNodePath = null;
 
+    public static void initRoot() {
+        ZkClient client = new ZkClient(SERVER, 5000, 5000, new BytesPushThroughSerializer());
+        client.createPersistent(ROOT, true);
+        client.close();
+        LOGGER.debug("init root : " + ROOT);
+    }
+
     public ZKLockImpl(String lockName) {
         this.lockName = lockName;
-        nodePath = root + "/" + lockName;
+        nodePath = ROOT + "/" + lockName;
         subIndex = nodePath.length();
-        client = new ZkClient(server, 5000, 5000, new BytesPushThroughSerializer());
+        client = new ZkClient(SERVER, 5000, 5000, new BytesPushThroughSerializer());
     }
 
     /**
@@ -55,11 +62,11 @@ public class ZKLockImpl implements ZKLock {
 
     private String getChildrenSeq(String childrenPath) {
         String temp = childrenPath.replaceFirst(lockName, "");
-        return seqPattern.matcher(temp).matches() ? temp : null;
+        return SEQ_PATTERN.matcher(temp).matches() ? temp : null;
     }
 
     private void validateChildren(final String seq, final CountDownLatch countDownLatch) {
-        List<String> childrenList = client.getChildren(root);
+        List<String> childrenList = client.getChildren(ROOT);
         String existMaxSeq = null;
         String maxSeqPath = null;
         String temp;
@@ -70,10 +77,8 @@ public class ZKLockImpl implements ZKLock {
                 maxSeqPath = str;
             }
         }
-        if (maxSeqPath != null) {
-            maxSeqPath = root + "/" + maxSeqPath;
-        }
         if (existMaxSeq != null) {
+            maxSeqPath = ROOT + "/" + maxSeqPath;
             IZkDataListener zkDataDeleteListener = new IZkDataListener() {
 
                 @Override
@@ -86,7 +91,7 @@ public class ZKLockImpl implements ZKLock {
                 public void handleDataChange(String dataPath, Object data) throws Exception {
                 }
             };
-            // logger.info("seq=" + seq + ", maxSeqPath=" + maxSeqPath);
+            // LOGGER.debug("seq=" + seq + ", maxSeqPath=" + maxSeqPath);
             client.subscribeDataChanges(maxSeqPath, zkDataDeleteListener);
         } else {
             countDownLatch.countDown();
@@ -104,7 +109,7 @@ public class ZKLockImpl implements ZKLock {
         String seq = getSeq(seqNodePath);
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        List<String> childrenList = client.getChildren(root);
+        List<String> childrenList = client.getChildren(ROOT);
         String existMaxSeq = null;
         String maxSeqPath = null;
         String temp;
@@ -116,10 +121,8 @@ public class ZKLockImpl implements ZKLock {
                 maxSeqPath = str;
             }
         }
-        if (maxSeqPath != null) {
-            maxSeqPath = root + "/" + maxSeqPath;
-        }
         if (existMaxSeq != null) {
+            maxSeqPath = ROOT + "/" + maxSeqPath;
             IZkDataListener zkDataDeleteListener = new IZkDataListener() {
 
                 @Override
@@ -132,7 +135,7 @@ public class ZKLockImpl implements ZKLock {
                 public void handleDataChange(String dataPath, Object data) throws Exception {
                 }
             };
-            // logger.info("seq=" + seq + ", maxSeqPath=" + maxSeqPath);
+            // LOGGER.debug("seq=" + seq + ", maxSeqPath=" + maxSeqPath);
             client.subscribeDataChanges(maxSeqPath, zkDataDeleteListener);
 
             try {
@@ -156,7 +159,7 @@ public class ZKLockImpl implements ZKLock {
         seqNodePath = createNode();
         String seq = getSeq(seqNodePath);
 
-        List<String> childrenList = client.getChildren(root);
+        List<String> childrenList = client.getChildren(ROOT);
         String existMaxSeq = null;
         String temp;
         for (String str : childrenList) {
@@ -195,7 +198,7 @@ public class ZKLockImpl implements ZKLock {
         String seq = getSeq(seqNodePath);
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        List<String> childrenList = client.getChildren(root);
+        List<String> childrenList = client.getChildren(ROOT);
         String existMaxSeq = null;
         String maxSeqPath = null;
         String temp;
@@ -206,22 +209,21 @@ public class ZKLockImpl implements ZKLock {
                 maxSeqPath = str;
             }
         }
-        if (maxSeqPath != null) {
-            maxSeqPath = root + "/" + maxSeqPath;
-        }
         if (existMaxSeq != null) {
+            maxSeqPath = ROOT + "/" + maxSeqPath;
             IZkDataListener zkDataDeleteListener = new IZkDataListener() {
 
                 @Override
                 public void handleDataDeleted(String dataPath) throws Exception {
                     validateChildren(seq, countDownLatch);
+                    client.unsubscribeDataChanges(dataPath, this);
                 }
 
                 @Override
                 public void handleDataChange(String dataPath, Object data) throws Exception {
                 }
             };
-
+            // LOGGER.debug("seq=" + seq + ", maxSeqPath=" + maxSeqPath);
             client.subscribeDataChanges(maxSeqPath, zkDataDeleteListener);
 
             try {
@@ -249,5 +251,6 @@ public class ZKLockImpl implements ZKLock {
             client.delete(seqNodePath);
             seqNodePath = null;
         }
+        client.close();
     }
 }

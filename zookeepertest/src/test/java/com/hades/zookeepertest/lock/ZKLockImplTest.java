@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLongArray;
 
-import org.I0Itec.zkclient.ZkClient;
-import org.I0Itec.zkclient.serialize.BytesPushThroughSerializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,11 +15,7 @@ public class ZKLockImplTest {
 
     @Before
     public void before() {
-        String server = "10.18.224.106:2181,10.18.224.106:2182,10.18.224.106:2183";
-        String root = "/root/lock";
-        ZkClient client = new ZkClient(server, 5000, 5000, new BytesPushThroughSerializer());
-        client.createPersistent(root, true);
-        client.close();
+        ZKLockImpl.initRoot();
     }
 
     @Test

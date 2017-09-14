@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 对集群中其他节点有效，不能将同一个锁对象用于单机的多个线程，不可重入
+ * 对集群中其他节点有效<br>
+ * 单机多线程使用时，需每个线程声明不同的对象来使用，不能将同一个锁对象用于单机的多个线程<br>
+ * 不可重入，释放后不可重用
  * 
  * @author HaDeS
  *
@@ -30,6 +32,9 @@ public class ZKLockImpl implements ZKLock {
 
     private String seqNodePath = null;
 
+    /**
+     * 初始化根节点
+     */
     public static void initRoot() {
         ZkClient client = new ZkClient(SERVER, 5000, 5000, new BytesPushThroughSerializer());
         client.createPersistent(ROOT, true);
@@ -37,6 +42,10 @@ public class ZKLockImpl implements ZKLock {
         LOGGER.debug("init root : " + ROOT);
     }
 
+    /**
+     * 
+     * @param lockName
+     */
     public ZKLockImpl(String lockName) {
         this.lockName = lockName;
         nodePath = ROOT + "/" + lockName;

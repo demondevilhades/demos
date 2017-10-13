@@ -66,7 +66,13 @@ public class BigDecimalEvaluator {
                 // is bd op
 
                 // is op
-            } else {
+            }
+            // unary
+            else if (Constants.ADDITION == ch || Constants.SUBTRACTION == ch || Constants.BOOLEAN_NOT == ch) {
+
+            }
+            // error
+            else {
                 throw new EvaluationException("cannot parse : " + expression);
             }
         }

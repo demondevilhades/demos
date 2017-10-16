@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hades</groupId>
-	<artifactId>jeval-ext</artifactId>
-	<version>0.0.1</version>
+	<artifactId>jexl-bigdecimal</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>jeval-ext</name>
+	<name>jexl-bigdecimal</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,9 +16,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>net.sourceforge.jeval</groupId>
-			<artifactId>jeval</artifactId>
-			<version>0.9.4</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-jexl3</artifactId>
+			<version>3.1</version>
 		</dependency>
 
 		<dependency>

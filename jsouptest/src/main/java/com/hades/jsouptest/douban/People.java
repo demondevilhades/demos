@@ -284,9 +284,9 @@ public class People {
     }
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("http.proxyHost", "proxy.zte.com.cn");
+        System.setProperty("http.proxyHost", "proxy.***.com.cn");
         System.setProperty("http.proxyPort", "80");
-        System.setProperty("https.proxyHost", "proxy.zte.com.cn");
+        System.setProperty("https.proxyHost", "proxy.***.com.cn");
         System.setProperty("https.proxyPort", "80");
         new People().run();
     }

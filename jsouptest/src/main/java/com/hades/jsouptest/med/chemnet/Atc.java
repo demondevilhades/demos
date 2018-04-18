@@ -10,7 +10,12 @@ import org.jsoup.select.Elements;
 
 import com.hades.jsouptest.med.yaozui.util.SleepUtil;
 
-public class Act {
+/**
+ * Anatomical Therapeutic Chemical 药物的解剖学、治疗学及化学分类法
+ * 
+ * @author hades
+ */
+public class Atc {
     @SuppressWarnings("unused")
     private final Logger logger = Logger.getLogger(this.getClass());
 
@@ -45,6 +50,6 @@ public class Act {
     }
 
     public static void main(String[] args) throws Exception {
-        new Act().run();
+        new Atc().run();
     }
 }

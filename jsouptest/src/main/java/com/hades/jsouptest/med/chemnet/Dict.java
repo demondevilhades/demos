@@ -10,6 +10,13 @@ import org.jsoup.select.Elements;
 
 import com.hades.jsouptest.med.yaozui.util.SleepUtil;
 
+/**
+ * International Nonproprietary Names for Pharmaceutical Substances 国际非专有药名<br>
+ * Proposed INN<br>
+ * Recommended INN<br>
+ * 
+ * @author hades
+ */
 public class Dict {
     private final Logger logger = Logger.getLogger(this.getClass());
 

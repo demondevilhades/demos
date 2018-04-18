@@ -1,9 +1,9 @@
 
 # nlp
 
-##  resources
+## resources
 
-###   aihanyu
+### aihanyu
 * from http://www.aihanyu.org/cncorpus/index.aspx
 
 * ACCorpusCharacterlist	古代汉语语料库字频表

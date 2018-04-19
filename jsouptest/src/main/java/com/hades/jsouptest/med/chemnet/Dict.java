@@ -15,6 +15,11 @@ import com.hades.jsouptest.med.yaozui.util.SleepUtil;
  * Proposed INN<br>
  * Recommended INN<br>
  * 
+ * �闩, 闩 : 呫诺<br>
+ * �f : 噁<br>
+ * 嗪<br>
+ * �� : 唵<br>
+ * 
  * @author hades
  */
 public class Dict {
@@ -27,8 +32,15 @@ public class Dict {
         Document doc = connAndParse(baseUrl);
         Element innTable = doc.select("div.hcent_m1_2 > dl > dd > table").get(0);
         Elements as = innTable.select("> tbody > tr > td > a");
+        boolean runFlag = false;
         for (Element a : as) {
-            String name = a.text();
+            String name = a.text().trim();
+            if ("r-INNList-27".equals(name)) {
+                runFlag = true;
+            }
+            if (!runFlag) {
+                continue;
+            }
             logger.info("run : " + name);
             parseListPage(name, rootUrl + a.attr("href"));
         }
@@ -84,9 +96,9 @@ public class Dict {
     }
 
     public static void main(String[] args) throws Exception {
-        System.getProperties().setProperty("http.proxyHost", "proxy.zte.com.cn");
+        System.getProperties().setProperty("http.proxyHost", "proxy.***.com.cn");
         System.getProperties().setProperty("http.proxyPort", "80");
-        System.getProperties().setProperty("https.proxyHost", "proxy.zte.com.cn");
+        System.getProperties().setProperty("https.proxyHost", "proxy.***.com.cn");
         System.getProperties().setProperty("https.proxyPort", "80");
         System.getProperties().setProperty("proxySet", "true");
         new Dict().run();

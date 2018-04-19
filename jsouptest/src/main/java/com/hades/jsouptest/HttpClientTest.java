@@ -19,7 +19,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 public class HttpClientTest {
     
     public void run(){
-        HttpGet get = new HttpGet("http://zteict.in.eclous.com/login");
+        HttpGet get = new HttpGet("http://test");
         CookieStore cookieStore = new BasicCookieStore();
         BasicClientCookie cookie = new BasicClientCookie("EKM_SN", "ddd807b107fb4900b0dcdf58b49c9d17");
         cookie.setDomain(get.getURI().getHost());
@@ -57,7 +57,7 @@ public class HttpClientTest {
     }
 
     public static void main(String[] args) {
-        HttpPost post = new HttpPost("http://zteict.in.eclous.com/login.loginform?" + System.currentTimeMillis());
+        HttpPost post = new HttpPost("http://test" + System.currentTimeMillis());
         CookieStore cookieStore = new BasicCookieStore();
         BasicClientCookie cookie = new BasicClientCookie("EKM_SN", "ddd807b107fb4900b0dcdf58b49c9d17");
         cookie.setDomain(post.getURI().getHost());

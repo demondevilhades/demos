@@ -1,6 +1,9 @@
 package com.hades.jsouptest.med.chemnet;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -27,7 +30,7 @@ public class Dict {
 
     private final String rootUrl = "http://cheman.chemnet.com";
     private final String baseUrl = rootUrl + "/drug_dict/";
-
+    
     public void run() throws Exception {
         Document doc = connAndParse(baseUrl);
         Element innTable = doc.select("div.hcent_m1_2 > dl > dd > table").get(0);
@@ -58,38 +61,61 @@ public class Dict {
                     String td1Str = tds.get(1).text().trim();
                     String td2Str = tds.get(2).text().trim();
 
+                    System.out.println(name + "\t" + td0Str + "\t" + td1Str + "\t" + td2Str);
+//                    System.out.println(new String(name.getBytes("gbk"), "utf-8") + "\t" + new String(td0Str.getBytes("gbk"), "utf-8")
+//                            + "\t" + new String(td1Str.getBytes("gbk"), "utf-8") + "\t" + new String(td2Str.getBytes("gbk"), "utf-8"));
 //                    DBHelper.executeUpdateExp(
 //                            "INSERT INTO med_inn (inn, enname, chname, efficacy) VALUES (?, ?, ?, ?)", new String[] {
 //                                    name, td0Str, td1Str, td2Str });
                 }
             }
 
-            SleepUtil.sleep60();
+//            SleepUtil.sleep60();
             // nextPage
             pageListUrl = null;
-            Elements as = doc.getElementById("iPage").select("a");
-            for (Element a : as) {
-                if ("下一页".equals(a.text().trim())) {
-                    pageListUrl = rootUrl + a.attr("href");
-                    break;
-                }
-            }
+//            Elements as = doc.getElementById("iPage").select("a");
+//            for (Element a : as) {
+//                if ("下一页".equals(a.text().trim())) {
+//                    pageListUrl = rootUrl + a.attr("href");
+//                    break;
+//                }
+//            }
         }
     }
 
-    private Document connAndParse(String url) throws IOException {
+    private Document connAndParse(String urlStr) throws IOException {
         Document doc = null;
+        URL url = new URL(urlStr);
         while (doc == null) {
+            HttpURLConnection connection = null;
+            InputStream is = null;
             try {
-                doc = Jsoup
-                        .connect(url)
-                        .timeout(30000)
-                        .userAgent(
-                                "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36")
-                        .execute().parse();
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(30000);
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36");
+                connection.connect();
+                is = connection.getInputStream();
+                doc = Jsoup.parse(is, "gbk", urlStr);
+//                doc = Jsoup
+//                        .connect(url)
+//                        .timeout(30000)
+//                        .userAgent(
+//                                "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36")
+//                        .execute().parse();
             } catch (Exception e) {
                 e.printStackTrace();
                 SleepUtil.sleep60();
+            } finally {
+                try {
+                    if(is != null){
+                        is.close();
+                    }
+                    if(connection != null){
+                        connection.disconnect();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return doc;
@@ -101,6 +127,7 @@ public class Dict {
         System.getProperties().setProperty("https.proxyHost", "proxy.***.com.cn");
         System.getProperties().setProperty("https.proxyPort", "80");
         System.getProperties().setProperty("proxySet", "true");
-        new Dict().run();
+//        new Dict().run();
+        new Dict().parseListPage("r-INNList-17", "http://cheman.chemnet.com/drug_dict/search.cgi?p=7&&f=search&c=r_inn&t=drug_dict&terms=r-INNList-17");
     }
 }

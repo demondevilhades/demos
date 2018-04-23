@@ -7,6 +7,7 @@ import org.junit.Test;
 
 public class SevenZUtilTest {
 
+    @SuppressWarnings("serial")
     @Test
     public void test() throws IOException {
 //      SevenZUtil.compress(new String[] { "temp/a1/test2.txt", "temp/test.txt" }, "temp/test.7z");

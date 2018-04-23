@@ -79,13 +79,6 @@ public class SevenZUtil {
         unCompress(bs, outputStr);
     }
 
-    /**
-     * unCompress
-     * 
-     * @param sevenZFile
-     * @param outputStr
-     * @throws IOException
-     */
     private static void unCompress(SevenZFile sevenZFile, String outputStr) throws IOException {
         SevenZArchiveEntry entry = sevenZFile.getNextEntry();
         while (entry != null) {
@@ -97,10 +90,8 @@ public class SevenZUtil {
                 if (!parentFile.exists()) {
                     parentFile.mkdirs();
                 }
-                byte[] bs = new byte[(int) entry.getSize()];
-                sevenZFile.read(bs);
                 FileOutputStream fos = new FileOutputStream(file);
-                fos.write(bs);
+                IOUtils.write(sevenZFile, fos);
                 fos.close();
             }
             entry = sevenZFile.getNextEntry();
@@ -142,6 +133,13 @@ public class SevenZUtil {
         }
     }
 
+    /**
+     * compress
+     * 
+     * @param fileStrs
+     * @param outputFileStr
+     * @throws IOException
+     */
     public static void compress(String[] fileStrs, String outputFileStr) throws IOException {
         File outputFile = new File(outputFileStr);
         SevenZOutputFile szof = null;
@@ -188,13 +186,6 @@ public class SevenZUtil {
         }
     }
 
-    /**
-     * compress
-     * 
-     * @param szof
-     * @param fileStrs
-     * @throws IOException
-     */
     private static void compress(SevenZOutputFile szof, String[] fileStrs) throws IOException {
         SevenZArchiveEntry entry = null;
         for (String fileStr : fileStrs) {
@@ -202,11 +193,9 @@ public class SevenZUtil {
             entry = szof.createArchiveEntry(file, fileStr);
             szof.putArchiveEntry(entry);
             if (!file.isDirectory()) {
-                byte[] bs = new byte[(int) file.length()];
                 FileInputStream fis = new FileInputStream(file);
-                fis.read(bs);
+                IOUtils.write(fis, szof);
                 fis.close();
-                szof.write(bs);
             }
             szof.closeArchiveEntry();
         }
@@ -231,11 +220,9 @@ public class SevenZUtil {
                 entry = szof.createArchiveEntry(file, mapEntry.getKey());
                 szof.putArchiveEntry(entry);
                 if (!file.isDirectory()) {
-                    byte[] bs = new byte[(int) file.length()];
                     FileInputStream fis = new FileInputStream(file);
-                    fis.read(bs);
+                    IOUtils.write(fis, szof);
                     fis.close();
-                    szof.write(bs);
                 }
                 szof.closeArchiveEntry();
 
@@ -250,6 +237,57 @@ public class SevenZUtil {
             } catch (IOException e) {
                 throw e;
             }
+        }
+    }
+
+    /**
+     * compress
+     * 
+     * @param originFile
+     * @param outputFileStr
+     * @throws IOException
+     */
+    public static void compress(File originFile, String outputFileStr) throws IOException {
+        File outputFile = new File(outputFileStr);
+        if (originFile.isDirectory() && outputFile.getPath().indexOf(originFile.getPath()) != -1) {
+            throw new RuntimeException("outputFile must not be the child of originFile");
+        }
+        SevenZOutputFile szof = null;
+        try {
+            szof = new SevenZOutputFile(outputFile);
+            compress(originFile, szof, "");
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            try {
+                if (szof != null) {
+                    szof.close();
+                }
+            } catch (IOException e) {
+                throw e;
+            }
+        }
+    }
+
+    private static void compress(File file, final SevenZOutputFile szof, final String parentPath) throws IOException {
+        if (file.isDirectory()) {
+            String path = parentPath + file.getName() + "/";
+
+            SevenZArchiveEntry entry = szof.createArchiveEntry(file, path);
+            szof.putArchiveEntry(entry);
+            szof.closeArchiveEntry();
+
+            File[] files = file.listFiles();
+            for (File childFile : files) {
+                compress(childFile, szof, path);
+            }
+        } else {
+            SevenZArchiveEntry entry = szof.createArchiveEntry(file, parentPath + file.getName());
+            szof.putArchiveEntry(entry);
+            FileInputStream fis = new FileInputStream(file);
+            IOUtils.write(fis, szof);
+            fis.close();
+            szof.closeArchiveEntry();
         }
     }
 }

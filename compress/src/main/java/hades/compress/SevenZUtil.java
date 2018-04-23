@@ -15,6 +15,13 @@ import org.apache.commons.compress.utils.SeekableInMemoryByteChannel;
 
 public class SevenZUtil {
 
+    /**
+     * unCompress
+     * 
+     * @param fileStr
+     * @param outputStr
+     * @throws IOException
+     */
     public static void unCompress(String fileStr, String outputStr) throws IOException {
         File outputFile = new File(fileStr);
         SevenZFile sevenZFile = null;
@@ -34,6 +41,13 @@ public class SevenZUtil {
         }
     }
 
+    /**
+     * unCompress
+     * 
+     * @param buffer
+     * @param outputStr
+     * @throws IOException
+     */
     public static void unCompress(byte[] buffer, String outputStr) throws IOException {
         SevenZFile sevenZFile = null;
         try {
@@ -52,12 +66,26 @@ public class SevenZUtil {
         }
     }
 
+    /**
+     * unCompress
+     * 
+     * @param is
+     * @param outputStr
+     * @throws IOException
+     */
     public static void unCompress(InputStream is, String outputStr) throws IOException {
         byte[] bs = new byte[is.available()];
         is.read(bs);
         unCompress(bs, outputStr);
     }
 
+    /**
+     * unCompress
+     * 
+     * @param sevenZFile
+     * @param outputStr
+     * @throws IOException
+     */
     private static void unCompress(SevenZFile sevenZFile, String outputStr) throws IOException {
         SevenZArchiveEntry entry = sevenZFile.getNextEntry();
         while (entry != null) {
@@ -79,6 +107,13 @@ public class SevenZUtil {
         }
     }
 
+    /**
+     * unCompress
+     * 
+     * @param buffer
+     * @return
+     * @throws IOException
+     */
     public static Map<String, byte[]> unCompressWithoutDirectory(byte[] buffer) throws IOException {
         Map<String, byte[]> map = new HashMap<String, byte[]>();
         SevenZFile sevenZFile = null;
@@ -107,8 +142,6 @@ public class SevenZUtil {
         }
     }
 
-    // ---
-
     public static void compress(String[] fileStrs, String outputFileStr) throws IOException {
         File outputFile = new File(outputFileStr);
         SevenZOutputFile szof = null;
@@ -128,6 +161,13 @@ public class SevenZUtil {
         }
     }
 
+    /**
+     * compress
+     * 
+     * @param fileStrs
+     * @return
+     * @throws IOException
+     */
     public static byte[] compress(String[] fileStrs) throws IOException {
         SeekableInMemoryByteChannel channel = new SeekableInMemoryByteChannel();
         SevenZOutputFile szof = null;
@@ -148,6 +188,13 @@ public class SevenZUtil {
         }
     }
 
+    /**
+     * compress
+     * 
+     * @param szof
+     * @param fileStrs
+     * @throws IOException
+     */
     private static void compress(SevenZOutputFile szof, String[] fileStrs) throws IOException {
         SevenZArchiveEntry entry = null;
         for (String fileStr : fileStrs) {
@@ -162,6 +209,47 @@ public class SevenZUtil {
                 szof.write(bs);
             }
             szof.closeArchiveEntry();
+        }
+    }
+
+    /**
+     * compress
+     * 
+     * @param map
+     *            (key : entryName ; value : file)
+     * @param outputFileStr
+     * @throws IOException
+     */
+    public static void compress(Map<String, String> map, String outputFileStr) throws IOException {
+        File outputFile = new File(outputFileStr);
+        SevenZOutputFile szof = null;
+        try {
+            szof = new SevenZOutputFile(outputFile);
+            SevenZArchiveEntry entry = null;
+            for (Map.Entry<String, String> mapEntry : map.entrySet()) {
+                File file = new File(mapEntry.getValue());
+                entry = szof.createArchiveEntry(file, mapEntry.getKey());
+                szof.putArchiveEntry(entry);
+                if (!file.isDirectory()) {
+                    byte[] bs = new byte[(int) file.length()];
+                    FileInputStream fis = new FileInputStream(file);
+                    fis.read(bs);
+                    fis.close();
+                    szof.write(bs);
+                }
+                szof.closeArchiveEntry();
+
+            }
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            try {
+                if (szof != null) {
+                    szof.close();
+                }
+            } catch (IOException e) {
+                throw e;
+            }
         }
     }
 }

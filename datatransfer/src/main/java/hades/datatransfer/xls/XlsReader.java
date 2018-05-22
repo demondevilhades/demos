@@ -17,11 +17,12 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import hades.bg.datatype.MysqlDataType;
+import hades.datatransfer.Input.InputWapper;
 import hades.datatransfer.util.BufferedFileWriter;
 import hades.datatransfer.util.DateUtils;
 
 public class XlsReader implements Closeable {
-    enum WorkbookType {
+    public enum WorkbookType {
         HSSF, XSSF, SXSSF
     }
 
@@ -47,7 +48,7 @@ public class XlsReader implements Closeable {
         file = new File(xlsFilePath);
     }
 
-    private List<Cell> readHeader(int sheetIndex, int headerRowNum) {
+    protected List<Cell> readHeader(int sheetIndex, int headerRowNum) {
         Sheet sheet = workbook.getSheetAt(sheetIndex);
         short firstCellNum;
         short lastCellNum;
@@ -62,7 +63,7 @@ public class XlsReader implements Closeable {
         return headerList;
     }
 
-    private List<Column> readColumnWithHeaderData(int sheetIndex, int headerRowNum, int dataRowNum) {
+    protected List<Column> readColumnWithHeaderData(int sheetIndex, int headerRowNum, int dataRowNum) {
         List<Cell> headerList = readHeader(sheetIndex, headerRowNum);
         List<Column> columnList = new ArrayList<>(headerList.size());
         for (int i = 0, size = headerList.size(); i < size; i++) {
@@ -102,7 +103,7 @@ public class XlsReader implements Closeable {
         return columnList;
     }
 
-    private List<Column> readColumnWithHeaderData(int sheetIndex, int headerRowNum) {
+    protected List<Column> readColumnWithHeaderData(int sheetIndex, int headerRowNum) {
         List<Cell> headerList = readHeader(sheetIndex, headerRowNum);
         List<Column> columnList = new ArrayList<>(headerList.size());
         for (int i = 0, size = headerList.size(); i < size; i++) {
@@ -189,7 +190,7 @@ public class XlsReader implements Closeable {
         return readMysqlTableCreateSql(columnList);
     }
 
-    private String readMysqlTableCreateSql(List<Column> columnList) {
+    protected String readMysqlTableCreateSql(List<Column> columnList) {
         StringBuilder sb = new StringBuilder();
         sb.append("CREATE TABLE ").append(formatDBName(file.getName().substring(0, file.getName().lastIndexOf("."))))
                 .append(" (\r\nID INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT");
@@ -213,18 +214,18 @@ public class XlsReader implements Closeable {
     }
 
     public void writeDataSql(int sheetIndex, int headerRowNum, String outputPath) throws IOException {
-        BufferedFileWriter bfw = null;
-        try {
-            bfw = new BufferedFileWriter(outputPath);
-            readData2Writer(sheetIndex, headerRowNum, bfw);
-        } finally {
-            if (bfw != null) {
-                bfw.close();
-            }
+        try (final BufferedFileWriter bfw = new BufferedFileWriter(outputPath)) {
+            readData2SQL(sheetIndex, headerRowNum, new SQLWapper() {
+
+                @Override
+                public void wapper(String sql) throws IOException {
+                    bfw.writeLine(sql);
+                }
+            });
         }
     }
 
-    private void readData2Writer(int sheetIndex, int headerRowNum, BufferedFileWriter bfw) throws IOException {
+    protected void readData2SQL(int sheetIndex, int headerRowNum, SQLWapper sqlWapper) throws IOException {
         List<Cell> headerList = readHeader(sheetIndex, headerRowNum);
 
         Sheet sheet = workbook.getSheetAt(sheetIndex);
@@ -276,23 +277,16 @@ public class XlsReader implements Closeable {
                 }
             }
             sb0.append(" )").append(sb1).append(" );");
-            bfw.writeLine(sb0.toString());
+            sqlWapper.wapper(sb0.toString());
             dataList.clear();
         }
     }
 
-    @Override
-    public void close() throws IOException {
-        if (workbook != null) {
-            workbook.close();
-        }
-    }
-
-    private String formatDBName(String name) {
+    protected String formatDBName(String name) {
         return name.toUpperCase().replaceAll(" ", "_");
     }
 
-    private String getCellStringValue(Cell cell) {
+    protected String getCellStringValue(Cell cell) {
         String value = null;
         if (cell != null) {
             switch (cell.getCellTypeEnum()) {
@@ -321,7 +315,19 @@ public class XlsReader implements Closeable {
         return value;
     }
 
-    static class Column {
+    @Override
+    public void close() throws IOException {
+        if (workbook != null) {
+            workbook.close();
+        }
+    }
+
+    public abstract class SQLWapper implements InputWapper<String> {
+
+        public abstract void wapper(String sql) throws IOException;
+    }
+
+    class Column {
         String name;
         Class<?> clazz;
         int size = -1;

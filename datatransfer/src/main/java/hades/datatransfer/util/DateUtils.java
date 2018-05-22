@@ -7,7 +7,7 @@ public class DateUtils {
 
     public static final String YMD = "yyyy-MM-dd";
 
-    private static final String[] datePatterns = {};
+    private static final String[] datePatterns = {YMD};
 
     public static boolean isDate(String str) {
         Date date = null;

@@ -11,7 +11,7 @@ public class ReflectionUtils {
 
     public static Object newInstance(Class<?> clazz, Class<?>[] parameterTypes, Object[] initargs)
             throws ReflectiveOperationException {
-        Constructor<?> constructor = clazz.getConstructor(parameterTypes);
+        Constructor<?> constructor = clazz.getDeclaredConstructor(parameterTypes);
         constructor.setAccessible(true);
         return constructor.newInstance(initargs);
     }

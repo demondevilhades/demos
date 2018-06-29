@@ -1,4 +1,6 @@
 
+SELECT @rownum:=@rownum+1 as row_number, id FROM test_table, (SELECT @rownum:=0) r ORDER BY id DESC ;
+
 -- 180
 select num0 as ConsecutiveNums from (
 select l0.num as num0, l1.num as num1, l2.num as num2 from Logs l0 

@@ -1,32 +1,32 @@
 package hades.datatransfer.dao;
 
-import hades.datatransfer.util.MysqlUtils;
+import hades.datatransfer.util.OracleUtils;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 
-public abstract class MysqlDao extends Dao {
+public abstract class OracleDao extends Dao {
 
     static DruidDataSource inputDataSource = null;
     static DruidDataSource outputDataSource = null;
 
-    public MysqlDao() {
+    public OracleDao() {
         super(inputDataSource, outputDataSource);
     }
 
     public static void initDataSource() throws Exception {
         if (inputDataSource == null) {
-            synchronized (MysqlDao.class) {
+            synchronized (OracleDao.class) {
                 if (inputDataSource == null) {
-                    inputDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(MysqlUtils.INPUT_PROP);
+                    inputDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(OracleUtils.INPUT_PROP);
                 }
             }
         }
         if (outputDataSource == null) {
-            synchronized (MysqlDao.class) {
+            synchronized (OracleDao.class) {
                 if (outputDataSource == null) {
                     outputDataSource = (DruidDataSource) DruidDataSourceFactory
-                            .createDataSource(MysqlUtils.OUTPUT_PROP);
+                            .createDataSource(OracleUtils.OUTPUT_PROP);
                 }
             }
         }
@@ -34,7 +34,7 @@ public abstract class MysqlDao extends Dao {
 
     public static void closeDataSource() throws Exception {
         if (inputDataSource != null) {
-            synchronized (MysqlDao.class) {
+            synchronized (OracleDao.class) {
                 if (inputDataSource != null) {
                     inputDataSource.close();
                     inputDataSource = null;
@@ -42,7 +42,7 @@ public abstract class MysqlDao extends Dao {
             }
         }
         if (outputDataSource != null) {
-            synchronized (MysqlDao.class) {
+            synchronized (OracleDao.class) {
                 if (outputDataSource != null) {
                     outputDataSource.close();
                     outputDataSource = null;

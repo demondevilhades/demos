@@ -1,17 +1,13 @@
 package hades.datatransfer.dao;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import com.alibaba.druid.pool.DruidDataSource;
 
 public abstract class Dao implements AutoCloseable {
+    protected DruidDataSource inputDs = null;
+    protected DruidDataSource outputDs = null;
 
-    protected Connection conn = null;
-
-    @Override
-    public void close() throws SQLException {
-        if (conn != null) {
-            conn.close();
-        }
-        conn = null;
+    public Dao(DruidDataSource inputDs, DruidDataSource outputDs) {
+        this.inputDs = inputDs;
+        this.outputDs = outputDs;
     }
 }

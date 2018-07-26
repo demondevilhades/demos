@@ -11,15 +11,10 @@ public class P160 {
             return null;
         }
         ListNode a = headA;
-        ListNode b;
-        L: while (a != null) {
-            b = headB;
-            while (b != null) {
-                if (a == b) {
-                    break L;
-                }
-                b = b.next;
-            }
+        ListNode b = headB;
+        while (a != b) {
+            a = a == null ? headB : a.next;
+            b = b == null ? headA : b.next;
         }
         return a;
     }

@@ -1,4 +1,5 @@
 
+SELECT * FROM test t WHERE (SELECT COUNT(1) FROM test t1 WHERE t.score >= t1.score) <= 2;
 SELECT @rownum:=@rownum+1 as row_number, id FROM test_table, (SELECT @rownum:=0) r ORDER BY id DESC ;
 
 -- 180

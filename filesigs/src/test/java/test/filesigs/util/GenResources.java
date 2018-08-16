@@ -29,10 +29,6 @@ public class GenResources {
     @Before
     public void init() throws Exception {
         LOGGER.info("init start.");
-        System.setProperty("http.proxyHost", "proxy.zte.com.cn");
-        System.setProperty("http.proxyPort", "80");
-        System.setProperty("https.proxyHost", "proxy.zte.com.cn");
-        System.setProperty("https.proxyPort", "80");
 
         Document dom = Jsoup.connect(url).get();
         Elements tables = dom.select("table");

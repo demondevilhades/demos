@@ -90,7 +90,8 @@
 						</manifest>
 					</archive>
 					<excludes>
-						<exclude>jdbc.properties</exclude>
+						<exclude>app.properties</exclude>
+						<exclude>log4j.properties</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

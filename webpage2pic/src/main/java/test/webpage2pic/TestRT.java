@@ -59,20 +59,40 @@ public class TestRT {
         File exportFile = new File(exportDir);
         if (htmlFile.exists() && htmlFile.isDirectory() && exportFile.exists() && exportFile.isDirectory()) {
             String[] htmlFileStrs = htmlFile.list(htmlFF);
+            Process chromeProcess = startChromeProcess();
             for (String htmlFileStr : htmlFileStrs) {
                 logger.info("run : " + htmlFileStr);
-                runChromeProcess(htmlFileStr);
+                runChromeTab(htmlFileStr);
             }
+            endChromeProcess(chromeProcess);
         }
         logger.info("run end");
     }
 
-    private void runChromeProcess(String htmlFileStr) throws IOException, InterruptedException {
+    private Process startChromeProcess() throws IOException, InterruptedException {
         Process process = currRuntime.exec(chromeFileStr);
         Thread.sleep(1500);
-//        robot.keyPress(KeyEvent.VK_F6);
-//        robot.keyRelease(KeyEvent.VK_F6);
-//        Thread.sleep(2000);
+        robot.keyPress(KeyEvent.VK_F11);
+        robot.keyRelease(KeyEvent.VK_F11);
+        Thread.sleep(100);
+        robot.keyPress(KeyEvent.VK_F11);
+        robot.keyRelease(KeyEvent.VK_F11);
+        Thread.sleep(100);
+        return process;
+    }
+
+    private void endChromeProcess(Process process) throws IOException, InterruptedException {
+        process.waitFor();
+        process.destroy();
+        robot.keyPress(KeyEvent.VK_ALT);
+        robot.keyPress(KeyEvent.VK_F4);
+        robot.keyRelease(KeyEvent.VK_ALT);
+    }
+
+    private void runChromeTab(String htmlFileStr) throws IOException, InterruptedException {
+        robot.keyPress(KeyEvent.VK_F6);
+        robot.keyRelease(KeyEvent.VK_F6);
+        Thread.sleep(1000);
 
         clipboard.setContents(new StringSelection(htmlDir + htmlFileStr), null);
         robot.keyPress(KeyEvent.VK_CONTROL);
@@ -83,15 +103,11 @@ public class TestRT {
 
         robot.keyPress(KeyEvent.VK_F11);
         robot.keyRelease(KeyEvent.VK_F11);
-        process.waitFor();
-        process.destroy();
         Thread.sleep(2000);
 
         savePic(htmlFileStr);
-
-        robot.keyPress(KeyEvent.VK_ALT);
-        robot.keyPress(KeyEvent.VK_F4);
-        robot.keyRelease(KeyEvent.VK_ALT);
+        robot.keyPress(KeyEvent.VK_F11);
+        robot.keyRelease(KeyEvent.VK_F11);
     }
 
     private void savePic(String htmlFileStr) throws IOException {

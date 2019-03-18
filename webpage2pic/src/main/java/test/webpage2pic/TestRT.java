@@ -170,7 +170,7 @@ public class TestRT {
     }
 
 //    private void de() {
-//        System.setProperty("webdriver.chrome.driver", "C:/Users/0096001654/AppData/Local/Google/Chrome/Application/chrome.exe");
+//        System.setProperty("webdriver.chrome.driver", "/chrome.exe");
 //
 //        String urlStr = tempDir + "test3.html";
 //        URL url = new URL("file:///" + urlStr);

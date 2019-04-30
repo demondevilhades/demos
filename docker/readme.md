@@ -4,6 +4,7 @@
 #########images
 
 docker pull tensorflow/tensorflow:1.13.1-py3
+
 docker pull ubuntu:18.04
 
 docker commit -a "zs" *** REPOSITORY:TAG
@@ -16,7 +17,7 @@ ssh root@ip 'docker save REPOSITORY:TAG'|docker load
 
 #for cpu
 docker run -i -t \
--e SSHD=Y 
+-e SSHD=Y \
 --name java8-1 \
 -v /data:/data \
 -p 10001:22 \
@@ -29,7 +30,7 @@ docker run -i -t \
 
 #for gpu
 docker run -i -t \
--e SSHD=Y 
+-e SSHD=Y \
 --name tf1.13-py3-gpu \
 -v /data:/data \
 -p 10001:22 \

@@ -1,21 +1,21 @@
 
-#docker
+#docker 
 
-#########images
+#########images 
 
-docker pull tensorflow/tensorflow:1.13.1-py3
+docker pull tensorflow/tensorflow:1.13.1-py3 
 
-docker pull ubuntu:18.04
+docker pull ubuntu:18.04 
 
-docker commit -a "zs" *** REPOSITORY:TAG
+docker commit -a "zs" *** REPOSITORY:TAG 
 
-docker save -o ***.tar REPOSITORY:TAG
+docker save -o ***.tar REPOSITORY:TAG 
 
-ssh root@ip 'docker save REPOSITORY:TAG'|docker load
+ssh root@ip 'docker save REPOSITORY:TAG'|docker load 
 
-#########start
+#########start 
 
-#for cpu
+#for cpu 
 docker run -i -t \
 -e SSHD=Y \
 --name java8-1 \
@@ -28,7 +28,7 @@ docker run -i -t \
 -v /etc/localtime:/etc/localtime:ro \
 -d ubuntu18-java8:v1.0
 
-#for gpu
+#for gpu 
 docker run -i -t \
 -e SSHD=Y \
 --name tf1.13-py3-gpu \

@@ -4,7 +4,7 @@ FROM oracle/openjdk:8
 MAINTAINER awesome
 
 # copy project 
-COPY ./aaa.jar ./bbb.jar ./ccc.jar ./ddd.jar ./eee.jar /root/
+COPY ./aaa.jar ./bbb.jar /root/
 
 CMD ["/docker-entrypoint.sh", "bash"]
 

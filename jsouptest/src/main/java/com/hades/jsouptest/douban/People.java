@@ -23,16 +23,18 @@ public class People {
 
     private final String itemColumnName = "name\turl\trating\tdate\ttags\tcomment";
 
-    private final String bookWishBaseUrl = "https://book.douban.com/people/#people#/wish";// 想读
-    private final String bookCollectBaseUrl = "https://book.douban.com/people/#people#/collect";// 读过
-    private final String bookReviewsBaseUrl = "https://book.douban.com/people/#people#/reviews";// 书评
-    private final String bookAnnotationBaseUrl = "https://book.douban.com/people/#people#/annotation/";// 笔记
-    private final String bookDoBaseUrl = "https://book.douban.com/people/#people#/do";// 在读
+    private final String bookBaseUrl = "https://book.douban.com";
+    private final String bookWishBaseUrl = bookBaseUrl + "/people/#people#/wish";// 想读
+    private final String bookCollectBaseUrl = bookBaseUrl + "/people/#people#/collect";// 读过
+    private final String bookReviewsBaseUrl = bookBaseUrl + "/people/#people#/reviews";// 书评
+    private final String bookAnnotationBaseUrl = bookBaseUrl + "/people/#people#/annotation/";// 笔记
+    private final String bookDoBaseUrl = bookBaseUrl + "/people/#people#/do";// 在读
 
-    private final String movieWishBaseUrl = "https://movie.douban.com/people/#people#/wish";// 想读
-    private final String movieCollectBaseUrl = "https://movie.douban.com/people/#people#/collect";// 读过
-    private final String movieReviewsBaseUrl = "https://movie.douban.com/people/#people#/reviews";// 影评
-    private final String movieDoBaseUrl = "https://movie.douban.com/people/#people#/do";// 在读
+    private final String movieBaseUrl = "https://movie.douban.com";
+    private final String movieWishBaseUrl = movieBaseUrl + "/people/#people#/wish";// 想读
+    private final String movieCollectBaseUrl = movieBaseUrl + "/people/#people#/collect";// 读过
+    private final String movieReviewsBaseUrl = movieBaseUrl + "/people/#people#/reviews";// 影评
+    private final String movieDoBaseUrl = movieBaseUrl + "/people/#people#/do";// 在读
 
     public void run() throws IOException {
         String dir = outputDir + peopleId + "/";
@@ -42,15 +44,16 @@ public class People {
         }
 
         String baseUrl = peopleBaseUrl.replace("#people#", peopleId);
+        logger.info(baseUrl);
         Response response = Jsoup
                 .connect(baseUrl)
                 .userAgent(
-                        "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36")
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36")
                 .method(Method.GET).execute();
         Map<String, String> cookies = response.cookies();
-        Document dom = response.parse();
+//        Document dom = response.parse();
 
-        baseInfo(dom, dir);
+//        baseInfo(dom, dir);
         // friend(dom, cookies);
 
         book(cookies, dir);
@@ -124,14 +127,14 @@ public class People {
         String bookWishUrl = bookWishBaseUrl.replace("#people#", peopleId);
         String bookCollectUrl = bookCollectBaseUrl.replace("#people#", peopleId);
         String bookDoUrl = bookDoBaseUrl.replace("#people#", peopleId);
-        @SuppressWarnings("unused")
         String bookReviewsUrl = bookReviewsBaseUrl.replace("#people#", peopleId);
-        @SuppressWarnings("unused")
         String bookAnnotationUrl = bookAnnotationBaseUrl.replace("#people#", peopleId);
 
         book2File(bookWishUrl, dir + "bookWish.txt", cookies);
         book2File(bookCollectUrl, dir + "bookCollect.txt", cookies);
         book2File(bookDoUrl, dir + "bookDoWish.txt", cookies);
+        book2File(bookReviewsUrl, dir + "bookReview.txt", cookies);
+        book2File(bookAnnotationUrl, dir + "bookAnnotation.txt", cookies);
     }
 
     private void book2File(String bookUrl, String fileName, Map<String, String> cookies) throws IOException {
@@ -145,6 +148,7 @@ public class People {
             fw = new FileWriter(file);
             fw.writeLine(itemColumnName);
             while (bookUrl != null) {
+                logger.info(bookUrl);
                 Document bookWishDom = Jsoup.connect(bookUrl).cookies(cookies).method(Method.GET).execute().parse();
                 Elements infoDivs = bookWishDom.getElementById("content").select(
                         "div.grid-16-8 > div.article > ul > li > div.info");
@@ -177,7 +181,7 @@ public class People {
                 }
                 Elements pageAs = bookWishDom.select("div.grid-16-8 > div.article > div.paginator > span.next > a");
                 if (pageAs.size() > 0) {
-                    bookUrl = pageAs.get(0).attr("href");
+                    bookUrl = bookBaseUrl + pageAs.get(0).attr("href");
                 } else {
                     bookUrl = null;
                 }
@@ -196,12 +200,12 @@ public class People {
         String movieWishUrl = movieWishBaseUrl.replace("#people#", peopleId);
         String movieCollectUrl = movieCollectBaseUrl.replace("#people#", peopleId);
         String movieDoUrl = movieDoBaseUrl.replace("#people#", peopleId);
-        @SuppressWarnings("unused")
         String movieReviewsUrl = movieReviewsBaseUrl.replace("#people#", peopleId);
 
         movie2File(movieWishUrl, dir + "movieWish.txt", cookies);
         movie2File(movieCollectUrl, dir + "movieCollect.txt", cookies);
         movie2File(movieDoUrl, dir + "movieDo.txt", cookies);
+        movie2File(movieReviewsUrl, dir + "movieReviews.txt", cookies);
     }
 
     private void movie2File(String bookUrl, String fileName, Map<String, String> cookies) throws IOException {
@@ -215,6 +219,7 @@ public class People {
             fw = new FileWriter(file);
             fw.writeLine(itemColumnName);
             while (bookUrl != null) {
+                logger.info(bookUrl);
                 Document bookWishDom = Jsoup.connect(bookUrl).cookies(cookies).method(Method.GET).execute().parse();
                 Elements infoDivs = bookWishDom.getElementById("content").select(
                         "div.grid-16-8 > div.article > div.grid-view > div.item > div.info");
@@ -245,7 +250,7 @@ public class People {
                 }
                 Elements pageAs = bookWishDom.select("div.grid-16-8 > div.article > div.paginator > span.next > a");
                 if (pageAs.size() > 0) {
-                    bookUrl = pageAs.get(0).attr("href");
+                    bookUrl = movieBaseUrl + pageAs.get(0).attr("href");
                 } else {
                     bookUrl = null;
                 }
@@ -284,10 +289,10 @@ public class People {
     }
 
     public static void main(String[] args) throws Exception {
-        System.setProperty("http.proxyHost", "proxy.***.com.cn");
-        System.setProperty("http.proxyPort", "80");
-        System.setProperty("https.proxyHost", "proxy.***.com.cn");
-        System.setProperty("https.proxyPort", "80");
+//        System.setProperty("http.proxyHost", "proxy.***.com.cn");
+//        System.setProperty("http.proxyPort", "80");
+//        System.setProperty("https.proxyHost", "proxy.***.com.cn");
+//        System.setProperty("https.proxyPort", "80");
         new People().run();
     }
 }
